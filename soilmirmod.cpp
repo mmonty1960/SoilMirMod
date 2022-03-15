@@ -25,7 +25,7 @@ multi-angular near-specular reflectance-spectra of soiled solar mirrors
 #include "soilmirmod.h"
 #include "ui_soilmirmod.h"
 #include <iostream>
-#include<QtWidgets>
+#include <QtWidgets>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
@@ -47,9 +47,9 @@ int Ndat=0,iGph=0,nTheta;
 double thetas[8];
 double Rmat[500][13];
 double ParFit[8][2];
+QString pathRoot;
+QString fileExp;
 QwtPlot *Gph;
-QString pathRoot="/home/marco/Workspace/SoiledMirror";
-QString fileExp=pathRoot+"/Results";
 
 //invoked functions ********************************
 double fmodel(double wl,double theta,double A,double S,double sigma,double C,double D,double k,double L,double B,double E);
@@ -81,7 +81,30 @@ SoilMirMod::SoilMirMod(QWidget *parent)
     connect(ui->doubleSpinBox_Xmax, SIGNAL(valueChanged(double)),this, SLOT( calcPlot()));
     connect(ui->doubleSpinBox_Ymin, SIGNAL(valueChanged(double)),this, SLOT( calcPlot()));
     connect(ui->doubleSpinBox_Ymax, SIGNAL(valueChanged(double)),this, SLOT( calcPlot()));
+
+#ifdef __unix__
+#define IS_POSIX 1
+#else
+#define IS_POSIX 0
+#endif
+
+if(IS_POSIX == 1) {
+    //Linux path initialization
+    const QByteArray value = qgetenv("USER");
+    QString uName=QString::fromLocal8Bit(value);
+    cout << "current user = " << uName.toStdString() <<endl;
+    pathRoot="/home/"+uName+"/Workspace/SoiledMirror";
+    fileExp=pathRoot+"/Results";
+    }
+else{
+    //windows path inizialization
+    pathRoot=getenv("PWD");
+    pathRoot=pathRoot+"workspace/SoiledMirror";
+    fileExp=pathRoot+"/Results";
+    }
 }
+
+
 
 SoilMirMod::~SoilMirMod()
 {
